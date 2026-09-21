@@ -1,0 +1,690 @@
+{
+  "name": "AI Job Match & Career Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-match",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f65ae0c3-170c-471f-b934-41bd122c4a62",
+      "name": "Webhook",
+      "webhookId": "8ad4f087-d3f9-4d12-8da5-89f335842db4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ee6a0e4-7409-47a2-8efa-f5d2c5f56d37",
+              "name": "job_title",
+              "value": "={{ $json.body.job_title }}",
+              "type": "string"
+            },
+            {
+              "id": "b9d881dd-6901-4460-ac84-5c54feb0d450",
+              "name": "skills",
+              "value": "={{ $json.body.skills }}",
+              "type": "string"
+            },
+            {
+              "id": "e7045d7c-ac90-4056-93e8-b5ff463d58a8",
+              "name": "location",
+              "value": "={{ $json.body.location }}",
+              "type": "string"
+            },
+            {
+              "id": "007e5379-d028-4060-9f7b-45863f03d178",
+              "name": "experience",
+              "value": "={{ $json.body.experience }}",
+              "type": "string"
+            },
+            {
+              "id": "b5554bca-d9cd-430e-b194-fd71bf0fa757",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "6f963d34-7d58-4f4d-a630-2a70568ed944",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "59750860-f89d-45b3-8f43-c8fcbd345736",
+              "leftValue": "={{ $json.job_title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5357e4f9-8c86-4ca2-86c3-9f14a4b9a81b",
+              "leftValue": "={{ $json.skills }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ebf80d0a-5990-4ab4-a8b2-f63b802aba90",
+              "leftValue": "={{ $json.location }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7753c459-5d3c-4be2-866b-2e44cabb7997",
+              "leftValue": "={{ $json.experience }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e0df4f86-e6d3-462c-a724-704b1213c911",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        0
+      ],
+      "id": "776a8b31-3d90-49a4-bcdb-ef5c7c2c9ee0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Find suitable job opportunities based on the following user profile:\n\nTarget job: {{ $json.job_title }}\nSkills: {{ $json.skills }}\nLocation: {{ $json.location }}\nExperience level: {{ $json.experience }}\nEmail: {{ $json.email }}\n\nAnalyze the user's profile and determine the best search criteria for finding relevant jobs.",
+        "options": {
+          "systemMessage": "You are an AI Job Matching Assistant.\n\nYour role is to help users find relevant job opportunities based on their target job title, skills, location, and experience level.\n\nYou MUST use the available HTTP Request tool to search for real job opportunities. Do not invent job listings.\n\nSteps:\n1. Read the user's target job title, skills, location, and experience level.\n2. Use the HTTP Request tool to search for relevant jobs.\n3. Analyze the returned jobs.\n4. Compare each job with the user's skills and experience.\n5. Rank the most suitable opportunities.\n6. Return up to 5 best matches.\n\nFor each job return:\n- Job title\n- Company name\n- Location\n- Job URL\n- Match score from 0 to 100\n- Short reason why the job matches the user\n- Important skills required\n- Any noticeable skill gaps\n\nPrefer jobs that are suitable for the user's experience level.\n\nNever invent a job, company, URL, salary, or requirement that is not present in the tool results.\n\nOnly mention required skills or skill gaps if they are explicitly supported by the job data returned by the tool. Do not infer specific requirements that are not present in the listing.\nIf no relevant jobs are found, Prioritize title relevance, skill match, experience compatibility, location match, and listing recency when ranking jobs. clearly tell the user that no suitable results were found.\n\nKeep the final response clear, concise, and structured."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "edc940b4-ae41-4c05-9785-0f71c25da628",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.6-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        128
+      ],
+      "id": "176a6959-097d-4ba2-9fa4-e6658b8f588e",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search Jooble Saudi Arabia for real job opportunities based on the user's target role, skills, location, and experience. Always use this tool when searching for jobs",
+        "method": "POST",
+        "url": "https://sa.jooble.org/api/YOUR_JOOBLE_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"keywords\": \"{{ $fromAI('keywords', 'Create concise job search keywords based on the user target job title and skills') }}\",\n  \"location\": \"{{ $fromAI('location', 'Use the user requested city or country for the job search') }}\",\n  \"page\": 1,\n  \"ResultOnPage\": 10\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.5,
+      "position": [
+        1056,
+        128
+      ],
+      "id": "d085738c-2ffb-4d81-a5d8-e354fe000923",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sa.jooble.org/api/YOUR_JOOBLE_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"keywords\": \"Data Analyst\",\n  \"location\": \"Saudi Arabia\",\n  \"page\": 1,\n  \"ResultOnPage\": 10\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        592,
+        224
+      ],
+      "id": "8a9accfb-8927-481f-a5d4-15edbfd70cfa",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "AI Job Match Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Search Date ": "={{ $now }}",
+            "Email": "={{ $('Edit Fields').item.json.email }}",
+            "Target Role": "={{ $('Edit Fields').item.json.job_title }}",
+            "Location": "={{ $('Edit Fields').item.json.location }}",
+            "Experience": "={{ $('Edit Fields').item.json.experience }}",
+            "AI Results": "={{ $('AI Agent').item.json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Search Date ",
+              "displayName": "Search Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target Role",
+              "displayName": "Target Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Experience",
+              "displayName": "Experience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Results",
+              "displayName": "AI Results",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1232,
+        -96
+      ],
+      "id": "c3f93e61-8ca2-4e7d-b37e-b4f68cc91eca",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_EMAIL@example.com",
+        "subject": "=Your Top Job Matches - {{ $json[\"Target Role\"] }}",
+        "message": "={{ $json[\"AI Results\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        -96
+      ],
+      "id": "1fcff19e-51a5-484a-8ef8-12d86afcbcf7",
+      "name": "Send a message",
+      "webhookId": "72d86456-4118-42ed-bce0-b85e1818f5b0"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Job search completed successfully.\",\n  \"result\": \"{{ $('AI Agent').item.json.output }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1616,
+        -96
+      ],
+      "id": "595815a3-0d61-422d-ae5b-4931a11c38c9",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": false,\n  \"message\": \"Please complete all required fields before submitting your job search.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1008,
+        352
+      ],
+      "id": "81346c8f-0b02-4b8c-a381-fdce5ef11f42",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "00c40e13-c46d-4bbd-8e26-400bd378bad7",
+              "leftValue": "={{ $json.body.cv.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a4997a0c-8055-4975-93ab-2006dc2c494f",
+      "name": "If1-CV Uploaded"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "={{ $json.body.cv.data.split(',')[1] }}",
+        "options": {
+          "fileName": "={{ $json.body.cv.name }}",
+          "mimeType": "application/pdf"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        -208
+      ],
+      "id": "9b71b914-aaea-457a-9c0a-7dc3be00f6db",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        -288
+      ],
+      "id": "4a5bcf22-613a-4bae-a471-b51736de4b19",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following CV text and extract the candidate's professional profile.\n\nCV TEXT:\n{{ $json.text }}\n\nReturn only information that is explicitly supported by the CV.\nDo not invent skills, experience, education, projects, certifications, or achievements.",
+        "options": {
+          "systemMessage": "You are a CV Profile Extraction Assistant.\n\nYour task is to analyze CV/resume text and convert it into a structured professional profile that can later be used for job matching.\n\nExtract only information explicitly found in the CV.\n\nReturn the profile using exactly these sections:\n\nPROFESSIONAL_SUMMARY:\nA concise summary of the candidate's background.\n\nEDUCATION:\nDegrees, majors, institutions, and relevant education details.\n\nEXPERIENCE:\nJobs, internships, training, responsibilities, and relevant experience.\n\nSKILLS:\nTechnical, analytical, business, and professional skills explicitly mentioned or clearly demonstrated in the CV.\n\nTOOLS:\nSoftware, platforms, programming languages, analytics tools, or technologies mentioned.\n\nPROJECTS:\nRelevant projects with brief descriptions.\n\nCERTIFICATIONS:\nCertificates, professional training, or credentials mentioned.\n\nKEYWORDS:\nA concise comma-separated list of job-relevant keywords extracted from the CV.\n\nDo not invent missing information.\nDo not estimate years of experience unless explicitly supported.\nDo not infer certifications that are not listed.\nIf a section has no information, write \"Not specified\".\nKeep the output concise and suitable for use by another AI job-matching agent."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        832,
+        -352
+      ],
+      "id": "cfe53dd3-11f0-4697-a7fa-187f3eb88ce3",
+      "name": "AI Agent1-CV Profile Extractor"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.6-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -512
+      ],
+      "id": "8a2986b8-6bcb-4206-ac86-d58853490243",
+      "name": "Google Gemini Chat Model1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2695ea85-453f-4cd1-88c0-1b5b9754772e",
+              "name": "job_title",
+              "value": "={{ $('Webhook').item.json.body.job_title }}",
+              "type": "string"
+            },
+            {
+              "id": "ac543024-94c4-4f2a-b7d0-bf2524fa1d76",
+              "name": "location",
+              "value": "={{ $('Webhook').item.json.body.location }}",
+              "type": "string"
+            },
+            {
+              "id": "6c892f83-bcd1-419b-b70c-314f70780f66",
+              "name": "experience",
+              "value": "={{ $('Webhook').item.json.body.experience }}",
+              "type": "string"
+            },
+            {
+              "id": "5d09292a-d67a-404f-a460-a9285cc3fd75",
+              "name": "email",
+              "value": "={{ $('Webhook').item.json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "34d305ed-1b69-4b19-82af-f25293494951",
+              "name": "skills",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "0eba9a6a-b8d9-44dd-91a4-6486e0db78e5",
+              "name": "cv_profile",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1248,
+        -304
+      ],
+      "id": "65a89f49-e62c-4131-8184-f2e0da97da7a",
+      "name": "Edit Fields1-Prepare CV Profile"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If1-CV Uploaded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1-CV Uploaded": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1-CV Profile Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1-CV Profile Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1-CV Profile Extractor": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1-Prepare CV Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1-Prepare CV Profile": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
