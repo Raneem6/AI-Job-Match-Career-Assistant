@@ -1,0 +1,13 @@
+# Secrets and credentials
+*.pem
+*.key
+*service-account*.json
+*credentials*.json
+.env
+.env.*
+
+# Local/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
