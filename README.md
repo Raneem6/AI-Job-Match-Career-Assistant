@@ -8,6 +8,20 @@ The workflow accepts job-search preferences through a webhook, validates the inp
 
 The project was designed around entry-level Data Analyst searches in Saudi Arabia, including Riyadh, Jeddah, Dammam, and remote/hybrid opportunities.
 
+## Project preview
+
+### User interface
+
+![AI Job Match and Career Assistant interface](screenshots/project-home.png)
+
+### Ranked job matches
+
+![Ranked job match results with match scores and skill gaps](screenshots/job-match-results.png)
+
+### n8n workflow execution
+
+![Successful n8n workflow execution](screenshots/workflow-execution.png)
+
 ## What the workflow does
 
 1. Receives search criteria through an n8n webhook.
